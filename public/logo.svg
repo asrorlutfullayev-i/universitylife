@@ -1,0 +1,7 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="40" height="40" rx="10" fill="#0A3D3A"/>
+  <!-- Samarqand 8-point star geometric emblem -->
+  <path d="M20 7L23.2 13.8L30 14.8L25 19.8L26.2 26.8L20 23.5L13.8 26.8L15 19.8L10 14.8L16.8 13.8L20 7Z" fill="#F2B01E"/>
+  <circle cx="20" cy="20" r="4.5" fill="#0B8A7E"/>
+  <circle cx="20" cy="20" r="2" fill="#EEF6F3"/>
+</svg>
