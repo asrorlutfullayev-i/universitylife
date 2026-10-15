@@ -21,9 +21,10 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const val = e.target.name === "hemisLogin" ? e.target.value.toLowerCase() : e.target.value;
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]: val,
     }));
   };
 
@@ -31,9 +32,11 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
 
+    const username = formData.hemisLogin.trim().toLowerCase();
+
     if (
       !formData.fullName.trim() ||
-      !formData.hemisLogin.trim() ||
+      !username ||
       !formData.university.trim() ||
       !formData.faculty.trim() ||
       !formData.groupName.trim() ||
@@ -43,14 +46,32 @@ export default function RegisterPage() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError("Parol kamida 6 ta belgidan iborat bo'lishi kerak.");
+    if (username.length < 3 || username.length > 20) {
+      setError("Foydalanuvchi nomi 3 dan 20 tagacha belgidan iborat bo'lishi kerak.");
+      return;
+    }
+
+    if (!/^[a-z]/.test(username)) {
+      setError("Foydalanuvchi nomi faqat lotin harfi bilan boshlanishi kerak.");
+      return;
+    }
+
+    if (!/^[a-z][a-z0-9._]*$/.test(username)) {
+      setError("Foydalanuvchi nomida faqat kichik lotin harflari, raqamlar, nuqta va pastki chiziq ishlatilishi mumkin.");
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setError("Parol kamida 8 ta belgidan iborat bo'lishi kerak.");
       return;
     }
 
     try {
       setLoading(true);
-      await registerWithHemis(formData);
+      await registerWithHemis({
+        ...formData,
+        hemisLogin: username,
+      });
       router.push("/");
       router.refresh();
     } catch (err: any) {
@@ -83,6 +104,14 @@ export default function RegisterPage() {
           </p>
         </div>
 
+        {/* Info Alert */}
+        <div className="mb-5 p-3.5 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-2.5 text-amber-800 text-xs">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-600" />
+          <div className="leading-relaxed">
+            Demo versiya. HEMIS parolingizni kiritmang, yangi parol o&apos;ylab toping.
+          </div>
+        </div>
+
         {/* Error Alert */}
         {error && (
           <div className="mb-5 p-3.5 rounded-xl bg-danger-soft border border-danger-text/20 flex items-start gap-2.5 text-danger-text text-sm">
@@ -111,17 +140,21 @@ export default function RegisterPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             <div>
               <label className="block text-xs font-semibold text-ink uppercase tracking-wider mb-1">
-                HEMIS Login
+                Foydalanuvchi nomi
               </label>
               <input
                 type="text"
                 name="hemisLogin"
-                placeholder="jasur.rahimov"
+                placeholder="masalan: ali.valiyev"
                 value={formData.hemisLogin}
                 onChange={handleChange}
                 required
                 className="w-full h-10 px-3.5 rounded-xl border border-black/10 bg-mist/50 text-ink placeholder:text-muted-text/50 focus:outline-none focus:ring-2 focus:ring-teal text-sm transition"
               />
+              {/* TODO: rename to username after launch */}
+              <span className="text-[11px] text-muted-text mt-1 block">
+                O&apos;zingiz o&apos;ylab topgan nom. Kichik harflar, raqam va nuqta.
+              </span>
             </div>
 
             <div>
@@ -131,7 +164,7 @@ export default function RegisterPage() {
               <input
                 type="password"
                 name="password"
-                placeholder="Kamida 6 belgi"
+                placeholder="Kamida 8 belgi"
                 value={formData.password}
                 onChange={handleChange}
                 required

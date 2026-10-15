@@ -88,7 +88,6 @@ export default function MediaDetailPage() {
               <Calendar className="w-3.5 h-3.5 text-teal" />
               <span>{formatDate(news.created_at)}</span>
             </span>
-            <DemoBadge />
           </div>
 
           <h1 className="font-heading font-bold text-xl md:text-2xl text-ink leading-snug">

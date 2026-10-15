@@ -18,7 +18,8 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { getCurrentProfile } from "@/lib/auth";
 import type { Profile, Opportunity, EventItem, GroupItem, LeaderboardEntry } from "@/types/database";
-import { LoadingState, ErrorState, CountdownBadge, DemoBadge, StarDecoration } from "@/components/ui/Feedback";
+import { LoadingState, ErrorState, CountdownBadge, StarDecoration } from "@/components/ui/Feedback";
+import { calculateLevel } from "@/lib/utils";
 
 export default function HomePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -216,7 +217,6 @@ export default function HomePage() {
               <Search className="w-4 h-4 text-teal" />
               <span>&ldquo;{searchQuery}&rdquo; bo&apos;yicha qidiruv natijalari</span>
             </h2>
-            <DemoBadge />
           </div>
 
           {searchResults.opportunities.length === 0 &&
@@ -262,8 +262,8 @@ export default function HomePage() {
                         className="p-3 rounded-xl bg-mist hover:bg-teal-light/40 transition flex items-center justify-between text-sm block"
                       >
                         <span className="font-semibold text-ink truncate pr-2">{ev.title}</span>
-                        <span className="text-xs font-bold text-teal bg-white px-2 py-0.5 rounded-full">
-                          +{ev.points} ball
+                        <span className="text-xs font-bold text-teal bg-white px-2 py-0.5 rounded-full font-sans tabular-nums">
+                          +{ev.points} XP
                         </span>
                       </Link>
                     ))}
@@ -304,47 +304,83 @@ export default function HomePage() {
                 Xush kelibsiz!
               </p>
               <h1 className="font-heading font-bold text-xl md:text-2xl text-ink">
-                {profile?.full_name || "Talaba"}
+                {profile?.full_name || profile?.hemis_login || "Talaba"}
               </h1>
               <p className="text-xs text-muted-text mt-0.5">
                 {profile?.university} • {profile?.faculty} • {profile?.group_name}
               </p>
             </div>
-            <DemoBadge />
           </div>
 
-          {/* MAIN BLOCK: Dark ink card with points (saffron, large) and "#N reyting" pill */}
-          <div className="relative overflow-hidden bg-ink text-white rounded-2xl p-6 md:p-8 shadow-md">
-            {/* 8-point star faint decoration */}
-            <StarDecoration className="absolute -right-4 -bottom-4 md:right-4 md:bottom-2" />
+          {/* MAIN BLOCK: Dark ink card with XP (saffron, large), level, progress bar, and "#N reyting" pill */}
+          {(() => {
+            const levelInfo = calculateLevel(userPoints);
+            return (
+              <div className="relative overflow-hidden bg-ink text-white rounded-2xl p-6 md:p-8 shadow-md">
+                {/* 8-point star faint decoration */}
+                <StarDecoration className="absolute -right-4 -bottom-4 md:right-4 md:bottom-2" />
 
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <span className="text-xs font-medium text-white/70 uppercase tracking-wider">
-                  Faollik Ballaringiz
-                </span>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <span className="font-heading font-bold text-4xl md:text-5xl text-saffron tracking-tight">
-                    {userPoints}
-                  </span>
-                  <span className="text-sm font-semibold text-white/80">ball</span>
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-white/70 uppercase tracking-wider">
+                        Faollik (XP)
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white/15 text-saffron border border-saffron/30">
+                        {levelInfo.level}
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <span className="font-sans font-bold tabular-nums text-4xl md:text-5xl text-saffron tracking-tight">
+                        {userPoints}
+                      </span>
+                      <span className="text-sm font-semibold text-white/80">XP</span>
+                    </div>
+                    <p className="text-xs text-white/60 mt-1 max-w-sm">
+                      Tadbirlarda QR orqali check-in qiling va XP to&apos;plab yangi darajalarga erishing.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Link
+                      href="/leaderboard"
+                      className="inline-flex items-center gap-2 bg-saffron text-ink px-4 py-2 rounded-full font-bold text-sm hover:bg-saffron-hover transition shadow-sm"
+                    >
+                      <Trophy className="w-4 h-4 stroke-[2]" />
+                      <span>
+                        #<span className="font-sans tabular-nums">{userRank ?? 1}</span> reyting
+                      </span>
+                    </Link>
+                  </div>
                 </div>
-                <p className="text-xs text-white/60 mt-1 max-w-sm">
-                  Tadbirlarda QR orqali check-in qiling va ball to&apos;plab reytingda ko&apos;tariling.
-                </p>
-              </div>
 
-              <div className="flex items-center gap-3">
-                <Link
-                  href="/leaderboard"
-                  className="inline-flex items-center gap-2 bg-saffron text-ink px-4 py-2 rounded-full font-heading font-bold text-sm hover:bg-saffron-hover transition shadow-sm"
-                >
-                  <Trophy className="w-4 h-4 stroke-[2]" />
-                  <span>#{userRank ?? 1} reyting</span>
-                </Link>
+                {/* Level Progress Bar */}
+                <div className="relative z-10 mt-5 pt-4 border-t border-white/10">
+                  <div className="flex items-center justify-between text-xs text-white/80 mb-1.5">
+                    <span>
+                      Daraja: <strong className="text-white">{levelInfo.level}</strong>
+                    </span>
+                    {levelInfo.nextLevelPoints ? (
+                      <span>
+                        Keyingi darajagacha:{" "}
+                        <strong className="font-sans tabular-nums text-saffron">
+                          {levelInfo.nextLevelPoints - levelInfo.currentPoints} XP
+                        </strong>
+                      </span>
+                    ) : (
+                      <span className="text-teal-light font-medium">Maksimal daraja</span>
+                    )}
+                  </div>
+                  <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                    <div
+                      className="bg-saffron h-full rounded-full transition-all duration-500"
+                      style={{ width: `${levelInfo.progressPercent}%` }}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            );
+          })()}
 
           {/* BELOW HERO: MAX 3 STAT ROWS (grid cards) */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -354,7 +390,7 @@ export default function HomePage() {
             >
               <div className="flex items-center justify-between text-teal mb-2">
                 <GraduationCap className="w-5 h-5 stroke-[1.8]" />
-                <span className="font-heading font-bold text-xl text-ink">
+                <span className="font-sans font-bold tabular-nums text-xl text-ink">
                   {scholarshipCount}
                 </span>
               </div>
@@ -369,7 +405,7 @@ export default function HomePage() {
             >
               <div className="flex items-center justify-between text-teal mb-2">
                 <Calendar className="w-5 h-5 stroke-[1.8]" />
-                <span className="font-heading font-bold text-xl text-ink">
+                <span className="font-sans font-bold tabular-nums text-xl text-ink">
                   {upcomingEventsCount}
                 </span>
               </div>
@@ -384,7 +420,7 @@ export default function HomePage() {
             >
               <div className="flex items-center justify-between text-teal mb-2">
                 <Globe className="w-5 h-5 stroke-[1.8]" />
-                <span className="font-heading font-bold text-xl text-ink">
+                <span className="font-sans font-bold tabular-nums text-xl text-ink">
                   {internationalCount}
                 </span>
               </div>
@@ -399,7 +435,7 @@ export default function HomePage() {
             >
               <div className="flex items-center justify-between text-teal mb-2">
                 <Users className="w-5 h-5 stroke-[1.8]" />
-                <span className="font-heading font-bold text-xl text-ink">
+                <span className="font-sans font-bold tabular-nums text-xl text-ink">
                   {sportClubsCount}
                 </span>
               </div>

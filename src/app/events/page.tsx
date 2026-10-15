@@ -56,10 +56,9 @@ export default function EventsPage() {
           <h1 className="font-heading font-bold text-xl md:text-2xl text-ink">
             Universitet Tadbirlari
           </h1>
-          <DemoBadge />
         </div>
         <p className="text-xs text-muted-text mt-0.5">
-          Tadbirlarda qatnashing, QR orqali check-in qiling va ball to&apos;plang
+          Tadbirlarda qatnashing, QR orqali check-in qiling va XP to&apos;plang
         </p>
       </div>
 
@@ -102,9 +101,9 @@ export default function EventsPage() {
                   <span className="text-xs font-semibold text-teal bg-teal-light px-2.5 py-0.5 rounded-full">
                     {ev.category}
                   </span>
-                  <span className="inline-flex items-center gap-1 text-xs font-bold text-saffron bg-saffron-light px-2.5 py-0.5 rounded-full border border-saffron/20">
+                  <span className="inline-flex items-center gap-1 text-xs font-bold text-saffron bg-saffron-light px-2.5 py-0.5 rounded-full border border-saffron/20 font-sans tabular-nums">
                     <Award className="w-3.5 h-3.5" />
-                    <span>+{ev.points} ball</span>
+                    <span>+{ev.points} XP</span>
                   </span>
                 </div>
 

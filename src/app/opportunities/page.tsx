@@ -66,7 +66,6 @@ function OpportunitiesList() {
             <h1 className="font-heading font-bold text-xl md:text-2xl text-ink">
               Stipendiya & Xalqaro Dasturlar
             </h1>
-            <DemoBadge />
           </div>
           <p className="text-xs text-muted-text mt-0.5">
             Ochiq tanlovlar, grantlar va almashinuv dasturlari

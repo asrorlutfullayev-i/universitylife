@@ -68,7 +68,6 @@ export default function GroupsPage() {
             <h1 className="font-heading font-bold text-xl md:text-2xl text-ink">
               Talabalar To&apos;garaklari
             </h1>
-            <DemoBadge />
           </div>
           <p className="text-xs text-muted-text mt-0.5">
             Sport seksiyalari, ilmiy laboratoriyalar va qiziqish klublari

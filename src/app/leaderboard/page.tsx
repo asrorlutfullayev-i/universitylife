@@ -46,27 +46,27 @@ export default function LeaderboardPage() {
   const getRankBadge = (rank: number) => {
     if (rank === 1) {
       return (
-        <span className="w-8 h-8 rounded-full bg-saffron text-ink font-heading font-bold text-sm flex items-center justify-center shadow-sm">
+        <span className="w-8 h-8 rounded-full bg-saffron text-ink font-sans font-bold tabular-nums text-sm flex items-center justify-center shadow-sm">
           🥇 1
         </span>
       );
     }
     if (rank === 2) {
       return (
-        <span className="w-8 h-8 rounded-full bg-slate-200 text-ink font-heading font-bold text-sm flex items-center justify-center shadow-sm">
+        <span className="w-8 h-8 rounded-full bg-slate-200 text-ink font-sans font-bold tabular-nums text-sm flex items-center justify-center shadow-sm">
           🥈 2
         </span>
       );
     }
     if (rank === 3) {
       return (
-        <span className="w-8 h-8 rounded-full bg-amber-100 text-amber-900 font-heading font-bold text-sm flex items-center justify-center shadow-sm">
+        <span className="w-8 h-8 rounded-full bg-amber-100 text-amber-900 font-sans font-bold tabular-nums text-sm flex items-center justify-center shadow-sm">
           🥉 3
         </span>
       );
     }
     return (
-      <span className="w-8 h-8 rounded-full bg-mist text-muted-text font-heading font-bold text-xs flex items-center justify-center">
+      <span className="w-8 h-8 rounded-full bg-mist text-muted-text font-sans font-bold tabular-nums text-xs flex items-center justify-center">
         #{rank}
       </span>
     );
@@ -80,7 +80,6 @@ export default function LeaderboardPage() {
           <h1 className="font-heading font-bold text-xl md:text-2xl text-ink">
             Talabalar Faollik Reytingi
           </h1>
-          <DemoBadge />
         </div>
         <p className="text-xs text-muted-text mt-0.5">
           Universitet bo&apos;yicha eng faol top-20 talabalar ro&apos;yxati
@@ -131,10 +130,10 @@ export default function LeaderboardPage() {
                 </div>
 
                 <div className="text-right flex-shrink-0">
-                  <span className="font-heading font-bold text-base md:text-lg text-saffron block leading-none">
+                  <span className="font-sans font-bold tabular-nums text-base md:text-lg text-saffron block leading-none">
                     {entry.total_points}
                   </span>
-                  <span className="text-[11px] font-semibold text-muted-text">ball</span>
+                  <span className="text-[11px] font-semibold text-muted-text">XP</span>
                 </div>
               </div>
             );

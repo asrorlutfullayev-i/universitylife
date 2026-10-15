@@ -56,3 +56,45 @@ export function getDeadlineInfo(deadlineString: string | Date) {
     daysLeft: diffDays,
   };
 }
+
+export interface LevelInfo {
+  level: string;
+  currentPoints: number;
+  nextLevelPoints: number | null;
+  progressPercent: number;
+}
+
+export function calculateLevel(points: number): LevelInfo {
+  const pts = Math.max(0, points || 0);
+  if (pts >= 600) {
+    return {
+      level: "Chempion",
+      currentPoints: pts,
+      nextLevelPoints: null,
+      progressPercent: 100,
+    };
+  }
+  if (pts >= 300) {
+    return {
+      level: "Yetakchi",
+      currentPoints: pts,
+      nextLevelPoints: 600,
+      progressPercent: Math.min(100, Math.round(((pts - 300) / (600 - 300)) * 100)),
+    };
+  }
+  if (pts >= 100) {
+    return {
+      level: "Faol",
+      currentPoints: pts,
+      nextLevelPoints: 300,
+      progressPercent: Math.min(100, Math.round(((pts - 100) / (300 - 100)) * 100)),
+    };
+  }
+  return {
+    level: "Boshlovchi",
+    currentPoints: pts,
+    nextLevelPoints: 100,
+    progressPercent: Math.min(100, Math.round((pts / 100) * 100)),
+  };
+}
+

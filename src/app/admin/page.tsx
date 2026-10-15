@@ -63,11 +63,11 @@ export default function AdminDashboardPage() {
 
   const ADMIN_MODULES = [
     {
-      title: "QR Check-in Skaner",
-      desc: "Tadbirda talabalar QR kodini skanerlash va ball berish",
+      title: "XP berish (QR Skaner)",
+      desc: "Tadbirda talabalar shaxsiy QR kodini skanerlash va XP berish",
       href: "/admin/checkin",
       icon: QrCode,
-      badge: `${stats.checkins} check-in`,
+      badge: `${stats.checkins} marta berilgan`,
       highlight: true,
     },
     {
@@ -87,7 +87,7 @@ export default function AdminDashboardPage() {
     },
     {
       title: "Tadbirlar",
-      desc: "Universitet tadbirlari, sana, manzil va ballarni boshqarish",
+      desc: "Universitet tadbirlari, sana, manzil va XP larni boshqarish",
       href: "/admin/events",
       icon: Calendar,
       badge: `${stats.events} ta`,
@@ -120,7 +120,6 @@ export default function AdminDashboardPage() {
             <h1 className="font-heading font-bold text-xl md:text-2xl text-ink">
               Administrator Boshqaruvi
             </h1>
-            <DemoBadge />
           </div>
           <p className="text-xs text-muted-text mt-0.5">
             Portal ma&apos;lumotlarini to&apos;liq nazorat qilish va yangilash

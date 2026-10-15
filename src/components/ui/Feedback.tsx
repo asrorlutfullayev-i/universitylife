@@ -86,12 +86,9 @@ export function CountdownBadge({ deadline }: { deadline: string }) {
 }
 
 export function DemoBadge() {
-  return (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-saffron/20 text-saffron border border-saffron/30">
-      Demo
-    </span>
-  );
+  return null;
 }
+
 
 export function StarDecoration({ className = "" }: { className?: string }) {
   return (

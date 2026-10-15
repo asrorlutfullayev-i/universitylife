@@ -48,7 +48,6 @@ export default function MediaPage() {
           <h1 className="font-heading font-bold text-xl md:text-2xl text-ink">
             Media & Yangiliklar
           </h1>
-          <DemoBadge />
         </div>
         <p className="text-xs text-muted-text mt-0.5">
           Universitet hayotidagi eng so&apos;nggi voqea va xushxabarlar

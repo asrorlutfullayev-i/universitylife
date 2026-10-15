@@ -112,7 +112,7 @@ export default function EventDetailPage() {
       setRegistration(data);
       setActionMessage({
         type: "success",
-        text: "Tabriklaymiz! Siz tadbirga muvaffaqiyatli ro'yxatdan o'tdingiz. Pastdagi QR-kodni tadbir kuni nazoratchiga ko'rsating.",
+        text: "Tabriklaymiz! Siz tadbirga muvaffaqiyatli ro'yxatdan o'tdingiz. Tadbirda Profil sahifasidagi shaxsiy QR kodingizni ko'rsating.",
       });
     } catch (err: any) {
       setActionMessage({
@@ -205,7 +205,6 @@ export default function EventDetailPage() {
               <span className="text-xs font-semibold text-teal bg-teal-light px-3 py-1 rounded-full">
                 {event.category}
               </span>
-              <DemoBadge />
             </div>
             <h1 className="font-heading font-bold text-xl md:text-2xl text-ink">
               {event.title}
@@ -213,9 +212,9 @@ export default function EventDetailPage() {
           </div>
 
           <div className="self-start">
-            <span className="inline-flex items-center gap-1.5 text-sm font-bold text-saffron bg-saffron-light px-3.5 py-1.5 rounded-full border border-saffron/20">
+            <span className="inline-flex items-center gap-1.5 text-sm font-bold text-saffron bg-saffron-light px-3.5 py-1.5 rounded-full border border-saffron/20 font-sans tabular-nums">
               <Award className="w-4 h-4" />
-              <span>+{event.points} ball taqdim etiladi</span>
+              <span>+{event.points} XP taqdim etiladi</span>
             </span>
           </div>
         </div>
@@ -257,7 +256,7 @@ export default function EventDetailPage() {
           </p>
         </div>
 
-        {/* REGISTRATION & QR CODE SECTION */}
+        {/* REGISTRATION SECTION */}
         <div className="pt-6 border-t border-black/5">
           {registration ? (
             <div className="bg-mist/60 rounded-2xl p-6 border border-black/5 flex flex-col items-center text-center max-w-md mx-auto">
@@ -272,34 +271,36 @@ export default function EventDetailPage() {
                   <p className="text-xs text-muted-text mb-2">
                     Siz ushbu tadbirda ishtirok etdingiz va ball hisobingizga qo&apos;shildi.
                   </p>
-                  <span className="inline-block px-3 py-1 rounded-full bg-teal text-white text-xs font-bold">
-                    +{event.points} ball qo&apos;shildi
+                  <span className="inline-block px-3 py-1 rounded-full bg-teal text-white text-xs font-bold font-sans tabular-nums">
+                    +{event.points} XP qo&apos;shildi
                   </span>
                 </div>
               ) : (
-                <div className="w-full space-y-4">
-                  <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-teal">
-                    <QrCode className="w-4 h-4" />
-                    <span>Sizning shaxsiy QR chiptangiz</span>
+                <div className="w-full space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-teal-light text-teal flex items-center justify-center mx-auto mb-1 shadow-sm">
+                    <CheckCircle2 className="w-6 h-6 stroke-[2]" />
                   </div>
+                  <h3 className="font-heading font-bold text-base text-ink">
+                    Siz ro&apos;yxatdan o&apos;tgansiz!
+                  </h3>
 
-                  {/* QR CODE DISPLAY */}
-                  <div className="p-4 bg-white rounded-2xl shadow-sm border border-black/5 inline-block">
-                    <QRCodeSVG
-                      value={registration.qr_token}
-                      size={180}
-                      level="H"
-                      includeMargin={true}
-                    />
-                  </div>
-
-                  <div>
-                    <span className="text-[11px] font-mono text-muted-text block">
-                      Token kodi: <strong className="text-ink">{registration.qr_token}</strong>
-                    </span>
-                    <p className="text-[11px] text-muted-text mt-1">
-                      Tadbir joyida mas&apos;ul tashkilotchiga ushbu QR-kodni skaner qildiring.
+                  <div className="p-4 bg-white rounded-xl border border-black/5 text-xs text-muted-text space-y-2">
+                    <p className="font-semibold text-ink text-sm">
+                      Tadbirda Profil sahifasidagi shaxsiy QR kodingizni ko&apos;rsating.
                     </p>
+                    <p>
+                      Admin shaxsiy QR kodingizni skaner qilganda sizga{" "}
+                      <strong className="text-teal font-sans tabular-nums font-semibold">+{event.points} XP</strong> beriladi.
+                    </p>
+                    <div className="pt-1">
+                      <Link
+                        href="/profile"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal text-white text-xs font-semibold hover:bg-teal-hover transition shadow-sm"
+                      >
+                        <QrCode className="w-3.5 h-3.5" />
+                        <span>Shaxsiy QR kodimni ko&apos;rish</span>
+                      </Link>
+                    </div>
                   </div>
 
                   <button
@@ -333,7 +334,7 @@ export default function EventDetailPage() {
                   </>
                 ) : (
                   <>
-                    <QrCode className="w-4 h-4" />
+                    <CheckCircle2 className="w-4 h-4" />
                     <span>Tadbirga ro&apos;yxatdan o&apos;tish</span>
                   </>
                 )}

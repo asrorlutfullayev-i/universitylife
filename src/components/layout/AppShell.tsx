@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { 
   Home, 
@@ -27,6 +26,20 @@ const NAV_ITEMS = [
   { href: "/media", label: "Media", icon: Newspaper },
   { href: "/profile", label: "Profil", icon: User },
 ];
+
+function NavbarLogo({ className = "h-9 w-auto" }: { className?: string }) {
+  return (
+    <svg width="160" height="36" viewBox="0 0 160 36" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+  <polygon points="20,8 32,14 20,20 8,14" fill="#0B8A7E"/>
+  <rect x="29" y="14" width="2.5" height="8" fill="#0B8A7E"/>
+  <ellipse cx="30.25" cy="22" rx="3.5" ry="2" fill="#F2B01E"/>
+  <text x="4" y="31" fontFamily="Arial Black, sans-serif" fontWeight="900" fontSize="22" fill="#0B8A7E">U</text>
+  <text x="17" y="31" fontFamily="Arial Black, sans-serif" fontWeight="900" fontSize="22" fill="#F2B01E">L</text>
+  <text x="44" y="25" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="15" fill="#FFFFFF">Univer</text>
+  <text x="89" y="25" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="15" fill="#F2B01E">Life</text>
+</svg>
+  );
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -68,19 +81,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* DESKTOP TOP BAR (>=768px) */}
       <header className="hidden md:block sticky top-0 z-50 bg-ink text-white shadow-md">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          {/* Logo & Wordmark */}
-          <Link href="/" className="flex items-center gap-3">
-            <Image
-              src="/logo.svg"
-              alt="UniverLife"
-              width={34}
-              height={34}
-              className="rounded-lg shadow-sm"
-            />
-            <span className="font-heading font-bold text-xl tracking-tight">
-              <span className="text-white">Univer</span>
-              <span className="text-teal-light">Life</span>
-            </span>
+          {/* Logo */}
+          <Link href="/" className="flex items-center flex-shrink-0" aria-label="UniverLife">
+            <NavbarLogo className="h-9 w-auto" />
           </Link>
 
           {/* Navigation Items */}
@@ -167,22 +170,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* MOBILE TOP BAR (<768px) */}
-      <header className="md:hidden sticky top-0 z-40 bg-ink text-white px-4 h-14 flex items-center justify-between shadow-sm">
-        <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/logo.svg"
-            alt="UniverLife"
-            width={28}
-            height={28}
-            className="rounded-md"
-          />
-          <span className="font-heading font-bold text-lg">
-            <span className="text-white">Univer</span>
-            <span className="text-teal-light">Life</span>
-          </span>
+      <header className="md:hidden sticky top-0 z-40 bg-ink text-white px-4 h-14 flex items-center justify-between gap-2 shadow-sm">
+        <Link href="/" className="flex items-center flex-shrink-0" aria-label="UniverLife">
+          <NavbarLogo className="h-8 w-auto" />
         </Link>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 flex-shrink-0">
           {profile?.role === "admin" && (
             <Link
               href="/admin"

@@ -54,8 +54,16 @@ export default function LoginPage() {
             </span>
           </div>
           <p className="text-sm text-muted-text font-normal">
-            HEMIS hisobingiz orqali platformaga kiring
+            Hisobingiz orqali platformaga kiring
           </p>
+        </div>
+
+        {/* Info Alert */}
+        <div className="mb-5 p-3.5 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-2.5 text-amber-800 text-xs">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-600" />
+          <div className="leading-relaxed">
+            Demo versiya. HEMIS parolingizni kiritmang, yangi parol o&apos;ylab toping.
+          </div>
         </div>
 
         {/* Error Alert */}
@@ -70,18 +78,19 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-ink uppercase tracking-wider mb-1.5">
-              HEMIS Login
+              Foydalanuvchi nomi
             </label>
             <input
               type="text"
               placeholder="masalan: ali.valiyev"
               value={hemisLogin}
-              onChange={(e) => setHemisLogin(e.target.value)}
+              onChange={(e) => setHemisLogin(e.target.value.toLowerCase())}
               required
               className="w-full h-11 px-3.5 rounded-xl border border-black/10 bg-mist/50 text-ink placeholder:text-muted-text/50 focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent transition"
             />
+            {/* TODO: rename to username after launch */}
             <span className="text-[11px] text-muted-text mt-1 block">
-              Universitet HEMIS tizimidagi login nomingiz
+              O&apos;zingiz o&apos;ylab topgan nom. Kichik harflar, raqam va nuqta.
             </span>
           </div>
 

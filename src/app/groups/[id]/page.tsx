@@ -215,7 +215,6 @@ export default function GroupDetailPage() {
                   </>
                 )}
               </span>
-              <DemoBadge />
             </div>
 
             <h1 className="font-heading font-bold text-xl md:text-2xl text-ink">

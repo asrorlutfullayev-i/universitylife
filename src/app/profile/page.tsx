@@ -16,24 +16,27 @@ import {
   CheckCircle2, 
   Clock, 
   X,
-  History
+  History,
+  AlertCircle,
+  Loader2
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { getCurrentProfile } from "@/lib/auth";
 import type { Profile, Application, EventRegistration, GroupMember, PointsLog } from "@/types/database";
-import { LoadingState, EmptyState, ErrorState, DemoBadge } from "@/components/ui/Feedback";
-import { formatDate, formatDateTime } from "@/lib/utils";
+import { LoadingState, EmptyState, ErrorState } from "@/components/ui/Feedback";
+import { formatDate, formatDateTime, calculateLevel } from "@/lib/utils";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [totalPoints, setTotalPoints] = useState(0);
+  const [personalQrToken, setPersonalQrToken] = useState<string | null>(null);
+  const [qrLoading, setQrLoading] = useState(true);
+  const [qrError, setQrError] = useState<string | null>(null);
+
   const [applications, setApplications] = useState<any[]>([]);
   const [eventRegistrations, setEventRegistrations] = useState<any[]>([]);
   const [myGroups, setMyGroups] = useState<any[]>([]);
   const [pointsHistory, setPointsHistory] = useState<PointsLog[]>([]);
-
-  // Selected QR modal
-  const [activeQr, setActiveQr] = useState<{ token: string; title: string } | null>(null);
 
   const [activeTab, setActiveTab] = useState<"apps" | "events" | "groups" | "points">("apps");
   const [loading, setLoading] = useState(true);
@@ -56,6 +59,19 @@ export default function ProfilePage() {
         return;
       }
       setProfile(prof);
+
+      // Load personal QR token via RPC
+      try {
+        setQrLoading(true);
+        const { data: token, error: qrErr } = await supabase.rpc("my_qr_token");
+        if (qrErr) throw qrErr;
+        setPersonalQrToken(token);
+      } catch (qErr: any) {
+        console.error("QR token error:", qErr);
+        setQrError("Shaxsiy QR kodni yuklab bo'lmadi.");
+      } finally {
+        setQrLoading(false);
+      }
 
       // 1. Applications with opportunity info
       const { data: apps } = await supabase
@@ -103,9 +119,57 @@ export default function ProfilePage() {
   if (loading) return <LoadingState message="Profil yuklanmoqda..." />;
   if (error || !profile) return <ErrorState message={error || "Profil topilmadi"} retry={loadProfileData} />;
 
+  const levelInfo = calculateLevel(totalPoints);
+
   return (
     <div className="space-y-6">
-      {/* Header Profile Card */}
+      {/* 1. SHAXSIY QR KOD KARTA (AT THE TOP) */}
+      <div className="bg-white rounded-2xl border border-black/5 p-6 md:p-8 shadow-sm flex flex-col items-center text-center">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mist text-teal text-xs font-semibold mb-3">
+          <QrCode className="w-4 h-4" />
+          <span>Shaxsiy QR kod</span>
+        </div>
+        <h2 className="font-heading font-bold text-lg md:text-xl text-ink mb-1">
+          Talaba identifikatori
+        </h2>
+        <p className="text-xs text-muted-text max-w-md mb-6">
+          Tadbirda yoki to&apos;garakda shu kodni admin skanerlaydi va sizga XP beradi.
+        </p>
+
+        {qrLoading ? (
+          <div className="w-[240px] h-[240px] flex flex-col items-center justify-center bg-mist/50 rounded-2xl border border-black/5">
+            <Loader2 className="w-8 h-8 text-teal animate-spin mb-2" />
+            <span className="text-xs text-muted-text">QR kod yuklanmoqda...</span>
+          </div>
+        ) : qrError || !personalQrToken ? (
+          <div className="w-[240px] h-[240px] flex flex-col items-center justify-center bg-danger-soft/40 rounded-2xl border border-danger-text/20 p-4">
+            <AlertCircle className="w-8 h-8 text-danger-text mb-2" />
+            <span className="text-xs text-danger-text text-center">{qrError || "QR kod topilmadi"}</span>
+          </div>
+        ) : (
+          <div className="p-3 bg-white rounded-2xl border border-black/10 shadow-sm inline-block">
+            <QRCodeSVG
+              value={personalQrToken}
+              size={240}
+              level="H"
+              includeMargin={true}
+              bgColor="#ffffff"
+              fgColor="#151230"
+            />
+          </div>
+        )}
+
+        <div className="mt-4">
+          <h3 className="font-heading font-bold text-base text-ink">
+            {profile.full_name}
+          </h3>
+          <p className="text-xs text-muted-text mt-0.5">
+            {profile.university} • {profile.faculty}
+          </p>
+        </div>
+      </div>
+
+      {/* 2. Header Profile Card */}
       <div className="bg-white rounded-2xl border border-black/5 p-6 md:p-8 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-start md:items-center gap-4">
@@ -124,13 +188,16 @@ export default function ProfilePage() {
                     Admin
                   </span>
                 )}
-                <DemoBadge />
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-light text-teal border border-teal/20">
+                  {levelInfo.level}
+                </span>
               </div>
 
-              <p className="text-xs text-muted-text mt-0.5">
-                HEMIS: <strong className="text-ink">{profile.hemis_login}</strong> • {profile.group_name}
+              {/* TODO: rename to username after launch */}
+              <p className="text-xs text-muted-text mt-1">
+                Foydalanuvchi nomi: <strong className="text-ink">{profile.hemis_login}</strong> • {profile.group_name}
               </p>
-              <p className="text-xs text-muted-text">
+              <p className="text-xs text-muted-text mt-0.5">
                 {profile.university} • {profile.faculty}
               </p>
             </div>
@@ -139,10 +206,10 @@ export default function ProfilePage() {
           <div className="flex items-center gap-3 self-start md:self-auto">
             <div className="bg-mist p-3 rounded-2xl border border-black/5 text-right px-5">
               <span className="text-[11px] font-semibold text-muted-text uppercase tracking-wider block">
-                Umumiy Ballar
+                Umumiy XP
               </span>
-              <span className="font-heading font-bold text-2xl text-saffron">
-                {totalPoints} ball
+              <span className="font-sans font-bold tabular-nums text-2xl text-saffron">
+                {totalPoints} XP
               </span>
             </div>
 
@@ -155,6 +222,31 @@ export default function ProfilePage() {
                 <span>Admin Panel</span>
               </Link>
             )}
+          </div>
+        </div>
+
+        {/* Level Progress Bar on Profile */}
+        <div className="mt-5 pt-4 border-t border-black/5">
+          <div className="flex items-center justify-between text-xs text-muted-text mb-1.5">
+            <span>
+              Daraja: <strong className="text-ink font-semibold">{levelInfo.level}</strong>
+            </span>
+            {levelInfo.nextLevelPoints ? (
+              <span>
+                Keyingi darajagacha:{" "}
+                <strong className="font-sans tabular-nums text-teal font-semibold">
+                  {levelInfo.nextLevelPoints - levelInfo.currentPoints} XP
+                </strong>
+              </span>
+            ) : (
+              <span className="text-teal font-semibold">Maksimal daraja</span>
+            )}
+          </div>
+          <div className="w-full bg-mist rounded-full h-2.5 overflow-hidden">
+            <div
+              className="bg-teal h-full rounded-full transition-all duration-500"
+              style={{ width: `${levelInfo.progressPercent}%` }}
+            />
           </div>
         </div>
       </div>
@@ -182,7 +274,7 @@ export default function ProfilePage() {
           }`}
         >
           <Calendar className="w-3.5 h-3.5" />
-          <span>Tadbirlarim & QR ({eventRegistrations.length})</span>
+          <span>Tadbirlarim ({eventRegistrations.length})</span>
         </button>
 
         <button
@@ -206,7 +298,7 @@ export default function ProfilePage() {
           }`}
         >
           <History className="w-3.5 h-3.5" />
-          <span>Ballar tarixi ({pointsHistory.length})</span>
+          <span>XP tarixi ({pointsHistory.length})</span>
         </button>
       </div>
 
@@ -304,23 +396,14 @@ export default function ProfilePage() {
 
                 <div className="flex items-center gap-2">
                   {reg.is_checked_in ? (
-                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-light text-teal border border-teal/20 flex items-center gap-1">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-teal-light text-teal border border-teal/20 flex items-center gap-1 font-sans tabular-nums">
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Check-in qilingan (+{reg.event?.points} ball)</span>
+                      <span>Check-in qilingan (+{reg.event?.points} XP)</span>
                     </span>
                   ) : (
-                    <button
-                      onClick={() =>
-                        setActiveQr({
-                          token: reg.qr_token,
-                          title: reg.event?.title || "Tadbir chiptasi",
-                        })
-                      }
-                      className="px-4 py-2 rounded-full bg-saffron text-ink hover:bg-saffron-hover text-xs font-semibold shadow-sm transition flex items-center gap-1.5"
-                    >
-                      <QrCode className="w-4 h-4" />
-                      <span>QR Chipta</span>
-                    </button>
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-mist text-muted-text border border-black/5">
+                      Ro&apos;yxatdan o&apos;tilgan
+                    </span>
                   )}
 
                   {reg.event && (
@@ -383,8 +466,8 @@ export default function ProfilePage() {
         <div className="space-y-3">
           {pointsHistory.length === 0 ? (
             <EmptyState
-              title="Ballar tarixi bo'sh"
-              description="Tadbirlarda qatnashing va QR check-in orqali faollik ballariga ega bo'ling."
+              title="XP tarixi bo'sh"
+              description="Tadbirlarda qatnashing va shaxsiy QR kodingiz orqali faollik XP lariga ega bo'ling."
             />
           ) : (
             pointsHistory.map((log) => (
@@ -401,56 +484,12 @@ export default function ProfilePage() {
                   </span>
                 </div>
 
-                <div className="font-heading font-bold text-sm text-saffron bg-saffron-light px-3 py-1 rounded-full border border-saffron/20">
-                  +{log.points} ball
+                <div className="font-sans font-bold tabular-nums text-sm text-saffron bg-saffron-light px-3 py-1 rounded-full border border-saffron/20">
+                  +{log.points} XP
                 </div>
               </div>
             ))
           )}
-        </div>
-      )}
-
-      {/* QR MODAL */}
-      {activeQr && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-black/10 text-center space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-black/5">
-              <h3 className="font-heading font-bold text-sm text-ink truncate pr-2">
-                {activeQr.title}
-              </h3>
-              <button
-                onClick={() => setActiveQr(null)}
-                className="text-muted-text hover:text-ink text-sm font-semibold p-1"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="p-4 bg-white rounded-xl inline-block shadow-sm border border-black/5 mx-auto">
-              <QRCodeSVG
-                value={activeQr.token}
-                size={180}
-                level="H"
-                includeMargin={true}
-              />
-            </div>
-
-            <div>
-              <p className="text-[11px] font-mono text-muted-text break-all">
-                Token: <strong className="text-ink">{activeQr.token}</strong>
-              </p>
-              <p className="text-xs text-muted-text mt-2">
-                Tadbirga kirishda ushbu QR kodni admin yoki nazoratchiga ko&apos;rsating.
-              </p>
-            </div>
-
-            <button
-              onClick={() => setActiveQr(null)}
-              className="w-full py-2 rounded-full bg-teal text-white text-xs font-semibold hover:bg-teal-hover transition"
-            >
-              Yopish
-            </button>
-          </div>
         </div>
       )}
     </div>

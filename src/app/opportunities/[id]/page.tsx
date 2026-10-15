@@ -181,7 +181,6 @@ export default function OpportunityDetailPage() {
                   </>
                 )}
               </span>
-              <DemoBadge />
             </div>
             <h1 className="font-heading font-bold text-xl md:text-2xl text-ink">
               {item.title}
